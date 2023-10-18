@@ -1,11 +1,9 @@
 import Empty from './Empty'
 import { View, FlatList } from 'react-native'
-import { Divider } from 'react-native-paper'
 
 const Separator = () => {
   return (
-    <View style={{ paddingVertical: 8 }}>
-      <Divider />
+    <View style={{ paddingVertical: 8, backgroundColor: "white" }}>
     </View>
   )
 }
@@ -15,6 +13,7 @@ export default ({ data, emptyMessage, emptyIcon, ...flatListProps }) => {
     <FlatList
       data={data}
       {...flatListProps}
+      contentContainerStyle={{ backgroundColor: "white" }}
       ItemSeparatorComponent={<Separator />}
       ListEmptyComponent={<Empty icon={emptyIcon} message={emptyMessage} />}
     />

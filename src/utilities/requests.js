@@ -11,12 +11,12 @@ export const requestServer = async (endpoint, payload, errorHandler) => {
 
     return response.data
   } catch (error) {
-    console.log(
-      "Axios Error:",
-      Object.fromEntries(
-        Object.entries(error)
-      )
-    )
+    // console.log(
+    //   "Axios Error:",
+    //   Object.fromEntries(
+    //     Object.entries(error)
+    //   )
+    // )
 
     if (error.response) {
       if (!errorHandler(error.response.data)) {

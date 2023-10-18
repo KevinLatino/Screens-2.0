@@ -14,44 +14,26 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
-import Screen from '../components/Screen'
+import Title from '../components/Title'
+import Subtitle from '../components/Subtitle'
+import Scroller from '../components/Scroller'
+import Padder from '../components/Padder'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { View, Alert, StyleSheet } from 'react-native'
-import { Text, Divider } from 'react-native-paper'
+import { Divider } from 'react-native-paper'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     gap: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 16,
-    paddingBottom: 16
+    backgroundColor: configuration.BACKGROUND_COLOR
   },
   inputsContainer: {
-    flex: 1,
-    gap: 1,
+    gap: 15,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 35,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 20,
-    color: "gray",
-    display: "flex",
-    textAlign: "center",
-  },
-  thirdText: {
-    fontSize: 18,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
+    justifyContent: 'center'
   }
 })
 
@@ -120,7 +102,7 @@ export default () => {
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [useUrlPicture, setUseUrlPicture] = useState(false)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
-  const [picture, setPicture] = useState("")
+  const [picture, setPicture] = useState(null)
 
   const handleSignUp = () => {
     if (!form.validate()) {
@@ -218,97 +200,102 @@ export default () => {
   }, [signUpData])
 
   return (
-    <Screen style={styles.container}>
-      <Text style={styles.title}>
-        Registrarse
-      </Text>
+    <Scroller>
+      <KeyboardAwareScrollView>
+        <Padder style={styles.container}>
+          <Title>
+            Registrarse
+          </Title>
 
-      <Text style={styles.subtitle}>
-        Ingresa tus datos personales
-      </Text>
+          <Subtitle>
+            Ingresa tus datos personales
+          </Subtitle>
 
-      <PictureInput
-        picture={picture}
-        onChangePicture={handleChangePicture}
-        useUrl={useUrlPicture}
-      />
+          <PictureInput
+            defaultIcon="account"
+            picture={picture}
+            onChangePicture={handleChangePicture}
+            useUrl={useUrlPicture}
+          />
 
-      <View style={styles.inputsContainer}>
-        <TextField
-          value={form.getField("name")}
-          onChangeText={form.setField("name")}
-          error={form.getError("name")}
-          placeholder="Nombre"
-        />
+          <View style={styles.inputsContainer}>
+            <TextField
+              value={form.getField("name")}
+              onChangeText={form.setField("name")}
+              error={form.getError("name")}
+              placeholder="Nombre"
+            />
 
-        <TextField
-          value={form.getField("first_surname")}
-          onChangeText={form.setField("first_surname")}
-          error={form.getError("first_surname")}
-          placeholder="Primer apellido"
-        />
+            <TextField
+              value={form.getField("first_surname")}
+              onChangeText={form.setField("first_surname")}
+              error={form.getError("first_surname")}
+              placeholder="Primer apellido"
+            />
 
-        <TextField
-          value={form.getField("second_surname")}
-          onChangeText={form.setField("second_surname")}
-          error={form.getError("second_surname")}
-          placeholder="Segundo apellido"
-        />
+            <TextField
+              value={form.getField("second_surname")}
+              onChangeText={form.setField("second_surname")}
+              error={form.getError("second_surname")}
+              placeholder="Segundo apellido"
+            />
 
-        <TextField
-          value={form.getField("phone_number")}
-          onChangeText={form.setField("phone_number")}
-          error={form.getError("phone_number")}
-          placeholder="Número telefónico"
-          keyboardType="numeric"
-        />
+            <TextField
+              value={form.getField("phone_number")}
+              onChangeText={form.setField("phone_number")}
+              error={form.getError("phone_number")}
+              placeholder="Número telefónico"
+              keyboardType="numeric"
+            />
 
-        {
-          signingUpWithPlainAccount ?
-          (
-            <View style={styles.inputsContainer}>
-              <TextField
-                value={form.getField("email")}
-                onChangeText={form.setField("email")}
-                error={form.getError("email")}
-                placeholder="Correo electrónico"
-              />
+            {
+              signingUpWithPlainAccount ?
+              (
+                <View style={styles.inputsContainer}>
+                  <TextField
+                    value={form.getField("email")}
+                    onChangeText={form.setField("email")}
+                    error={form.getError("email")}
+                    placeholder="Correo electrónico"
+                  />
 
-              <TextField
-                value={form.getField("password")}
-                onChangeText={form.setField("password")}
-                error={form.getError("password")}
-                placeholder="Contraseña"
-                secureTextEntry
-              />
-            </View>
-          ) :
-          null
-        }
-      </View>
+                  <TextField
+                    value={form.getField("password")}
+                    onChangeText={form.setField("password")}
+                    error={form.getError("password")}
+                    placeholder="Contraseña"
+                    secureTextEntry
+                  />
+                </View>
+              ) :
+              null
+            }
+          </View>
 
-      <Button
-        onPress={handleSignUp}
-        disabled={isSignUpLoading}
-        style={{ width: "70%" }}
-      >
-        {
-          isSignUpLoading ?
-          <LoadingSpinner /> :
-          "Registrarse"
-        }
-      </Button>
+          <Button
+            onPress={handleSignUp}
+            disabled={isSignUpLoading}
+            style={{ width: "70%" }}
+          >
+            {
+              isSignUpLoading ?
+              <LoadingSpinner /> :
+              "Registrarse"
+            }
+          </Button>
 
-      <Divider style={{ width: "90%" }} />
+          <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.thirdText}>
-        También puedes registrarte con
-      </Text>
+          <Subtitle>
+            También puedes registrarte con
+          </Subtitle>
 
-      <GoogleSignInButton
-        text="Registrate con Google"
-        onSignIn={fillUpFormWithGoogleData}
-      />
-    </Screen>
+          <GoogleSignInButton
+            text="Registrate con Google"
+            onSignIn={fillUpFormWithGoogleData}
+          />
+        </Padder>
+      </KeyboardAwareScrollView>
+    </Scroller>
   )
 }

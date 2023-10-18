@@ -1,8 +1,9 @@
 import { TouchableRipple, Avatar } from 'react-native-paper'
 import { formatBase64String } from '../utilities/formatting'
 import { selectPictureFromGallery } from '../utilities/camera'
+import configuration from '../configuration'
 
-export default ({ picture, onChangePicture, useUrl, ...avatarProps }) => {
+export default ({ picture, defaultIcon, onChangePicture, useUrl, ...avatarProps }) => {
   const handleChangePicture = async () => {
     const newPicture = await selectPictureFromGallery()
 
@@ -19,10 +20,24 @@ export default ({ picture, onChangePicture, useUrl, ...avatarProps }) => {
     <TouchableRipple
       onPress={handleChangePicture}
     >
-      <Avatar.Image
-        source={{ uri: source }}
-        {...avatarProps}
-      />
+      {
+        picture !== null ?
+        (
+          <Avatar.Image
+            source={{ uri: source }}
+            size={80}
+            {...avatarProps}
+          />
+        ) :
+        (
+          <Avatar.Icon
+            icon={defaultIcon}
+            size={80}
+            color="white"
+            style={{ backgroundColor: configuration.ACCENT_COLOR_2, color: "white" }}
+          />
+        )
+      }
     </TouchableRipple>
   )
 }

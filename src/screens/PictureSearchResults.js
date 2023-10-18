@@ -6,7 +6,8 @@ import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Scroller from '../components/Scroller'
+import Padder from '../components/Padder'
 import { View, Image, StyleSheet } from 'react-native'
 import { Divider } from 'react-native-paper'
 import { Title2 } from 'react-native-ios-kit'
@@ -90,12 +91,14 @@ export default () => {
   const { picture } = route.params
 
   return (
-    <Screen style={styles.container}>
-      <PictureDisplay picture={picture} />
+    <Scroller>
+      <Padder>
+        <PictureDisplay picture={picture} />
 
-      <Divider style={{ width: "90%" }} />
+        <Divider style={{ width: "90%" }} />
 
-      <PostsList picture={picture} />
-    </Screen>
+        <PostsList picture={picture} />
+      </Padder>
+    </Scroller>
   )
 }

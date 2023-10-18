@@ -1,58 +1,42 @@
 import { useNavigation } from '@react-navigation/native'
 import { formatBase64String } from '../utilities/formatting'
-import LikeButton from './LikeButton'
-import { View, Image } from 'react-native'
-import { Card } from '@ui-kitten/components'
-import { Headline, Subhead, Caption1 } from 'react-native-ios-kit'
-import { Chip, IconButton } from 'react-native-paper'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { View, Image, StyleSheet } from 'react-native'
+import { Caption1 } from 'react-native-ios-kit'
+import { TouchableRipple, Text, IconButton } from 'react-native-paper'
+import configuration from '../configuration'
 
-const styles = {
-  extraInformationView: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    width: "100%"
-  },
-  contentView: {
-    flexDirection: "column",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
-    gap: 12
-  },
-  categoriesView: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    gap: 10,
-    width: "40%"
-  },
-  buttonsView: {
+const styles = StyleSheet.create({
+  tile: {
     width: "100%",
+    borderRadius: 15,
+    backgroundColor: configuration.BACKGROUND_COLOR,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-evenly",
     alignItems: "center",
-    gap: 10
+    padding: 15,
+    gap: 10,
+    shadowColor: "silver",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 8
+  },
+  informationContainer: {
+    width: "50%",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    columnGap: 10,
+  },
+  image: {
+    borderRadius: 15,
+    resizeMode: 'contain'
   }
-}
+})
 
 export default ({ post }) => {
   const navigation = useNavigation()
-
-  const categoriesChips = post
-      .categories
-      .map((category, index) => {
-        return (
-          <Chip
-            key={index}
-            mode="flat"
-            icon="shape"
-          >
-            {category}
-          </Chip>
-        )
-      })
-  const likesText = `${post.likes} ${post.likes === 1 ? "like" : "likes"}`
 
   const navigateToPostView = () => {
     navigation.navigate("PostView", {
@@ -60,67 +44,75 @@ export default ({ post }) => {
     })
   }
 
-  const navigateToStoreView = () => {
-    navigation.navigate("StoreView", {
-      storeId: post.store_id
-    })
+  const navigateToStoreView= () => {
+    navigation.navigate(
+      "StoreView",
+      {
+        storeId: post.store_id
+      }
+    )
   }
 
-  const header = (
-    <View>
-      <Headline>
-        {post.title}
-      </Headline>
-
-      <Caption1>
-        ₡{post.price}
-        •
-        {
-          post.amount === 1 ?
-          "Una unidad disponible" :
-          `${post.amount} unidades disponibles`
-        }
-      </Caption1>
-    </View>
-  )
-
   return (
-    <Card
+    <TouchableRipple
       onPress={navigateToPostView}
-      header={header}
     >
-      <Image
-        source={{
-          uri: formatBase64String(post.multimedia[0]),
-          height: 100
-        }}
-      />
+      <View style={styles.tile}>
+        <Image
+          source={{
+            uri: formatBase64String(post.multimedia[0]),
+            height: 120,
+            width: 120,
+          }}
+          style={styles.image}
+        />
 
-      <Subhead>
-        {post.description}
-      </Subhead>
+        <View style={styles.informationContainer}>
+          <View>
+            <Text
+              variant="titleMedium"
+              style={{ color: "white" }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {post.title}
+            </Text>
 
-      <View style={styles.extraInformationView}>
-        <View style={styles.categoriesView}>
-          {categoriesChips}
+            <Caption1 style={{ color: "white" }}>
+              {
+                post.amount === 1 ?
+                "Una unidad disponible" :
+                `${post.amount} unidades disponibles`
+              }
+            </Caption1>
+          </View>
+
+          <Caption1 style={{ fontWeight: "bold", color: configuration.ACCENT_COLOR_1 }}>
+            ₡{post.price}.00
+          </Caption1>
+
+          <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", gap: 15, width: "100%" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+              <Caption1 style={{ color: configuration.ACCENT_COLOR_1 }}>
+                {post.likes}
+              </Caption1>
+
+              <MaterialCommunityIcons
+                name='heart'
+                color={configuration.ACCENT_COLOR_1}
+                size={24}
+              />
+            </View>
+
+            <IconButton
+              icon="store-outline"
+              iconColor={configuration.ACCENT_COLOR_1}
+              style={{ backgroundColor: "white" }}
+              onPress={navigateToStoreView}
+            />
+          </View>
         </View>
-        
-        <Caption1>
-          {likesText}
-        </Caption1>
       </View>
-
-      <View style={styles.buttonsView}>
-        <IconButton
-          icon="store"
-          onPress={navigateToStoreView}
-        />
-
-        <LikeButton
-          postId={post.post_id}
-          doesCustomerLikePost={post.does_customer_like_post}
-        />
-    </View>
-    </Card>
+    </TouchableRipple>
   )
 }

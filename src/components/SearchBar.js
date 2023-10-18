@@ -4,9 +4,15 @@ import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
-import { View, StyleSheet, Dimensions } from 'react-native'
+import {
+  View,
+  ScrollView as ReactNativeScrollView,
+  StyleSheet,
+  Dimensions
+} from 'react-native'
 import { TableView, RowItem } from 'react-native-ios-kit'
 import { IconButton, Chip } from 'react-native-paper'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   container: {
@@ -15,16 +21,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "white"
+    backgroundColor: configuration.BACKGROUND_COLOR
   },
   selectedCategoriesList: {
     backgroundColor: "white",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    alignSelf: "flex-start",
-    gap: 4,
-    padding: 10,
+    gap: 10,
+    padding: 8,
     width: "100%"
   }
 })
@@ -58,8 +60,10 @@ const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
         <Chip
           key={categoryName}
           onClose={() => onDelete(categoryName)}
-          icon="shape"
+          icon="pound"
           closeIcon="close"
+          style={{ backgroundColor: configuration.BACKGROUND_COLOR }}
+          textStyle={{ color: "white" }}
         >
           {categoryName}
         </Chip>
@@ -67,9 +71,12 @@ const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
     })
 
   return (
-    <View style={styles.selectedCategoriesList}>
+    <ReactNativeScrollView
+      horizontal
+      style={styles.selectedCategoriesList}
+    >
       {chips}
-    </View>
+    </ReactNativeScrollView>
   )
 }
 
@@ -134,7 +141,7 @@ export default ({ onSearchSubmit, onPictureTaken, ...searchInputProps }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: configuration.BACKGROUND_COLOR }}>
           <SearchInput
             placeholder="Buscar..."
             value={text}
@@ -146,6 +153,7 @@ export default ({ onSearchSubmit, onPictureTaken, ...searchInputProps }) => {
 
         <IconButton
           icon="camera"
+          iconColor="white"
           onPress={handleTakePicture}
         /> 
       </View>

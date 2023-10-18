@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-import { FlatList } from 'react-native'
+import { View, FlatList } from 'react-native'
 
 export default ({ children })  => {
   return (
@@ -9,9 +8,9 @@ export default ({ children })  => {
       keyExtractor={() => "dummy"}
       renderItem={null}
       ListHeaderComponent={() => (
-        <Fragment>
+        <View style={{ flex: 1 }}>
           {children}
-        </Fragment>
+        </View>
       )}
     />
   )

@@ -4,15 +4,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
+import Padder from '../components/Padder'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import Button from '../components/Button'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Fragment } from 'react'
-import { View, StyleSheet, Alert, Dimensions } from 'react-native'
-import { FAB } from 'react-native-paper'
+import Title from '../components/Title'
+import FloatingActionButton from '../components/FloatingActionButton'
+import { View, Alert, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   buttonContainer: {
     width: "100%",
     position: "absolute",
@@ -98,22 +103,9 @@ const LocationsScrollView = ({ saleId }) => {
   }
 
   return (
-    <View>
-      <View style={{ padding: 20, justifyContent: "center", alignItems: "center" }}>
-        <Button
-          style={{ width: "70%" }}
-          onPress={handleSubmit}
-          disabled={selectedLocation === null || createDeliveryMutation.isLoading}
-        >
-          {
-            createDeliveryMutation.isLoading ?
-            <LoadingSpinner /> :
-            "Programar entrega"
-          }
-        </Button>
-      </View>
-
+    <View style={{ gap: 20 }}>
       <ScrollView
+        style={{ flex: 1 }}
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
@@ -133,6 +125,18 @@ const LocationsScrollView = ({ saleId }) => {
         emptyIcon="map-marker"
         emptyMessage="No has añadido ningún domicilio"
       />
+
+      <Button
+        style={{ width: "70%" }}
+        onPress={handleSubmit}
+        disabled={selectedLocation === null || createDeliveryMutation.isLoading}
+      >
+        {
+          createDeliveryMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Programar entrega"
+        }
+      </Button>
     </View>
   )
 }
@@ -148,16 +152,20 @@ export default () => {
   }
 
   return (
-    <Fragment>
-      <SafeAreaView>
-        <LocationsScrollView saleId={saleId} />
-      </SafeAreaView>
+    <Padder style={styles.container}>
+      <Title>
+        Escoge el destino de tu compra
+      </Title>
 
-      <FAB
+      <LocationsScrollView
+        saleId={saleId}
+      />
+
+      <FloatingActionButton
         icon="plus"
         style={styles.fab}
         onPress={navigateToAddLocation}
       />
-    </Fragment>
+    </Padder>
   )
 }

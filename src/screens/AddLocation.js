@@ -1,35 +1,26 @@
 import { useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
-import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
-import SearchInput from '../components/SearchInput'
-import LoadingSpinner from '../components/LoadingSpinner'
+import { formatLocation } from '../utilities/formatting'
+import Padder from '../components/Padder'
+import Title from '../components/Title'
+import Subtitle from '../components/Subtitle'
 import Button from '../components/Button'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, StyleSheet, Dimensions } from 'react-native'
-import { withTheme } from 'react-native-ios-kit'
-import { TouchableRipple, List } from 'react-native-paper'
+import LocationSelector from '../components/LocationSelector'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    width: "100%",
-    position: "absolute",
-    top: Dimensions.get("screen").height * 0.8,
-    justifyContent: "center",
-    alignItems: "center"
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 20
   }
 })
 
-const addLocation = async (geoapifyAddress, customerId) => {
-  const location = {
-    place_name: geoapifyAddress.name,
-    street_address: geoapifyAddress.address_line1,
-    city: geoapifyAddress.city,
-    state: geoapifyAddress.state ?? geoapifyAddress.province,
-    zip_code: geoapifyAddress.postcode,
-  }
+const addLocation = async (location, customerId) => {
   const payload = {
     customer_id: customerId,
     ...location
@@ -40,111 +31,21 @@ const addLocation = async (geoapifyAddress, customerId) => {
   )
 }
 
-const _AddressAutocompleteTile = ({ isSelected, address, onSelect, theme }) => {
-  return (
-    <TouchableRipple
-      onPress={() => onSelect(address)}
-    >
-      <List.Item
-        style={
-          isSelected ?
-          {
-            backgroundColor: theme.primaryColor,
-          } :
-          null
-        }
-        titleStyle={
-          isSelected ?
-          {
-            color: "white"
-          } :
-          null
-        }
-        descriptionStyle={
-          isSelected ?
-          {
-            color: "white"
-          } :
-          null
-        }
-        key={address.place_id}
-        title={address.formatted}
-        left={(props) => <List.Icon {...props} icon="map-marker" />}
-      />
-    </TouchableRipple>
-  )
-}
-
-const AddressAutocompleteTile = withTheme(_AddressAutocompleteTile)
-
-const AddressAutocompleteInput = ({ selectedAddress, onSelect }) => {
-  const [searchedText, setSearchedText] = useState("")
-
-  const handleSearch = () => {
-    getAddressesMutation.mutate({ searchedText })
-  }
-
-  const getAddressesMutation = useMutation(
-    ({ searchedText }) => autocompleteAddress(searchedText)
-  )
-
-  if (getAddressesMutation.isLoading) {
-    return (
-      <LoadingSpinner inScreen />
-    )
-  }
-
-  const tiles = !getAddressesMutation.data
-      ? null
-      : (
-        getAddressesMutation.data.map((address) => {
-          return (
-            <AddressAutocompleteTile
-              key={address.place_id}
-              address={address}
-              isSelected={
-                (selectedAddress !== null) &&
-                (address.place_id === selectedAddress.place_id)
-              }
-              onSelect={onSelect}
-            />
-          )
-        })
-      )
-
-  return (
-    <View>
-      <SearchInput
-        value={searchedText}
-        onChangeText={setSearchedText}
-        onSubmitEditing={handleSearch}
-        placeholder="Ubicación"
-      />
-
-      <View>
-        <List.Section>
-          {tiles}
-        </List.Section>
-      </View>
-    </View>
-  )
-}
-
 export default () => {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
   const [session, _] = useSession()
 
-  const [selectedAddress, setSelectedAddress] = useState(null)
+  const [location, setLocation] = useState(null)
 
-  const handleAdd = () => {
+  const handleAddLocation = () => {
     addLocationMutation.mutate({
-      selectedAddress,
+      location,
       customerId: session.data.customerId
     })
   }
 
-  const handleSuccess = (_) => {
+  const handleAddLocationSuccess = () => {
     queryClient.refetchQueries({
       queryKey: ["customerLocations"]
     })
@@ -153,36 +54,42 @@ export default () => {
   }
 
   const addLocationMutation = useMutation(
-    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
+    ({ location, customerId }) => addLocation(location, customerId),
     {
-      onSuccess: handleSuccess
+      onSuccess: handleAddLocationSuccess
     }
   )
 
   return (
-    <SafeAreaView style={{ gap: 20 }}>
-      <AddressAutocompleteInput
-        selectedAddress={selectedAddress}
-        onSelect={setSelectedAddress}
+    <Padder style={styles.container}>
+      <Title>
+        Añade un domicilio
+      </Title>
+
+      <Subtitle>
+        {
+          location !== null ?
+          formatLocation(location) :
+          null
+        }
+      </Subtitle>
+
+      <LocationSelector
+        onSelect={setLocation}
+        isAlternative
       />
 
-      <View
-        style={styles.buttonContainer}
+      <Button
+        style={{ width: "70%" }}
+        disabled={location === null || addLocationMutation.isLoading}
+        onPress={handleAddLocation}
       >
-        <Button
-          style={{ width: "70%" }}
-          onPress={handleAdd}
-          disabled={
-            selectedAddress === null || addLocationMutation.isLoading
-          }
-        >
-          {
-            addLocationMutation.isLoading ?
-            <LoadingSpinner /> :
-            "Añadir domicilio"
-          }
-        </Button>
-      </View>
-    </SafeAreaView>
+        {
+          addLocationMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Añadir"
+        }
+      </Button>
+    </Padder>
   )
 }

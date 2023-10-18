@@ -1,6 +1,18 @@
 import * as Linking from 'expo-linking'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { requestServer } from '../utilities/requests'
 import { Alert } from 'react-native'
 import { List, TouchableRipple } from 'react-native-paper'
+
+const activateDelivery = async (deliveryId) => {
+  const payload = {
+    delivery_id: deliveryId
+  }
+  const _ = await requestServer(
+    "/deliveries_service/activate_delivery",
+    payload
+  )
+}
 
 const formatUberState = (uberState) => {
   switch (uberState) {
@@ -52,17 +64,61 @@ const TrackLocationIcon = ({ delivery, ...props }) => {
   )
 }
 
-export default ({ delivery }) =>  {
+export default ({ activable, delivery }) =>  {
+  const queryClient = useQueryClient()
+
+  const handleActivateDelivery = () => {
+    Alert.alert(
+      "¿Deseas activar esta entrega?",
+      "Estás apunto de activar esta entrega, una vez activada la entrega no podrás desactivarla",
+      [
+        {
+          text: "Cancelar",
+          onPress: null
+        },
+        {
+          text: "Activar",
+          onPress: () => {
+            activateDeliveryMutation.mutate({
+              deliveryId: delivery.delivery_id
+            })
+          }
+        }
+      ]
+    )
+  }
+
+  const handleActivateDeliverySuccess = () => {
+    queryClient.refetchQueries({
+      queryKey: ["activeDeliveries"]
+    })
+
+    queryClient.refetchQueries({
+      queryKey: ["inactiveDeliveries"] })
+  }
+
+  const activateDeliveryMutation = useMutation(
+    ({ deliveryId }) => activateDelivery(deliveryId),
+    {
+      onSuccess: handleActivateDeliverySuccess
+    }
+  )
+
   const title = delivery.post.title
   const amount = delivery.sale.amount
   const uberState = delivery.uber_state
   const placeName = delivery.location.place_name
 
   return (
-    <List.Item
-      title={`${amount} ${amount === 1 ? "unidad" : "unidades"} de '${title}'`}
-      description={`${placeName}: ${uberState ? formatUberState(uberState) : "entrega sin asignar"}`}
-      left={(props) => <TrackLocationIcon {...props} delivery={delivery} />}
-    />
+    <TouchableRipple
+      disabled={!activable}
+      onPress={handleActivateDelivery}
+    >
+      <List.Item
+        title={`${amount} ${amount === 1 ? "unidad" : "unidades"} de '${title}'`}
+        description={`${placeName}: ${uberState ? formatUberState(uberState) : "entrega sin asignar"}`}
+        left={(props) => <TrackLocationIcon {...props} delivery={delivery} />}
+      />
+    </TouchableRipple>
   )
 }

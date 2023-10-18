@@ -1,10 +1,13 @@
 import { StyleSheet } from 'react-native'
 import { Button, Headline } from 'react-native-ios-kit'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    backgroundColor: configuration.ACCENT_COLOR_1,
+    borderColor: configuration.ACCENT_COLOR_1
   },
   text: {
     color: "#ffffff",

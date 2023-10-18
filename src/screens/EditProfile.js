@@ -9,9 +9,10 @@ import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
-import Screen from '../components/Screen'
+import Title from '../components/Title'
+import Scroller from '../components/Scroller'
+import Padder from '../components/Padder'
 import { Alert, StyleSheet } from 'react-native'
-import { Text } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -126,54 +127,56 @@ export default () => {
   }
 
   return (
-    <Screen style={styles.container}>
-      <Text variant="titleLarge">
-        Configuración
-      </Text>
+    <Scroller>
+      <Padder style={styles.container}>
+        <Title>
+          Edita tu información
+        </Title>
 
-      <PictureInput
-        picture={picture}
-        onChangePicture={setPicture}
-      />
+        <PictureInput
+          picture={picture}
+          onChangePicture={setPicture}
+        />
 
-      <TextField
-        value={form.getField("name")}
-        onChangeText={form.setField("name")}
-        error={form.getError("name")}
-        placeholder="Nombre"
-      />
+        <TextField
+          value={form.getField("name")}
+          onChangeText={form.setField("name")}
+          error={form.getError("name")}
+          placeholder="Nombre"
+        />
 
-      <TextField
-        value={form.getField("first_surname")}
-        onChangeText={form.setField("first_surname")}
-        error={form.getError("first_surname")}
-        placeholder="Primer apellido"
-      />
+        <TextField
+          value={form.getField("first_surname")}
+          onChangeText={form.setField("first_surname")}
+          error={form.getError("first_surname")}
+          placeholder="Primer apellido"
+        />
 
-      <TextField
-        value={form.getField("second_surname")}
-        onChangeText={form.setField("second_surname")}
-        error={form.getError("second_surname")}
-        placeholder="Segundo apellido"
-      />
+        <TextField
+          value={form.getField("second_surname")}
+          onChangeText={form.setField("second_surname")}
+          error={form.getError("second_surname")}
+          placeholder="Segundo apellido"
+        />
 
-      <TextField
-        value={form.getField("phone_number")}
-        onChangeText={form.setField("phone_number")}
-        error={form.getError("phone_number")}
-        placeholder="Número telefónico"
-      />
+        <TextField
+          value={form.getField("phone_number")}
+          onChangeText={form.setField("phone_number")}
+          error={form.getError("phone_number")}
+          placeholder="Número telefónico"
+        />
 
-      <Button
-        onPress={handleUpdate}
-        disabled={updateCustomerMutation.isLoading}
-      >
-        {
-          updateCustomerMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Confirmar"
-        }
-      </Button>
-    </Screen>
+        <Button
+          onPress={handleUpdate}
+          disabled={updateCustomerMutation.isLoading}
+        >
+          {
+            updateCustomerMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Confirmar"
+          }
+        </Button>
+      </Padder>
+    </Scroller>
   )
 }

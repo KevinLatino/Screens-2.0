@@ -1,14 +1,8 @@
-import { withTheme } from 'react-native-ios-kit'
+import { formatLocation } from '../utilities/formatting'
 import { TouchableRipple, List } from "react-native-paper"
+import configuration from '../configuration'
 
-const formatLocationSubtitle = (location) => {
-  const formatted
-    = `${location.street_address}, ${location.city}, ${location.state}`
-
-  return formatted
-}
-
-const LocationTile = ({ location, isSelected, onPress, theme }) => {
+export default ({ location, isSelected, onPress }) => {
   return (
     <TouchableRipple
       onPress={onPress}
@@ -17,30 +11,22 @@ const LocationTile = ({ location, isSelected, onPress, theme }) => {
         style={
           isSelected ?
           {
-            backgroundColor: theme.primaryColor,
+            backgroundColor: configuration.ACCENT_COLOR_1,
           } :
-          null
-        }
-        titleStyle={
-          isSelected ?
           {
-            color: "white"
-          } :
-          null
+            backgroundColor: configuration.BACKGROUND_COLOR
+          }
         }
-        descriptionStyle={
-          isSelected ?
-          {
-            color: "white"
-          } :
-          null
-        }
+        titleStyle={{
+          color: "white"
+        }}
+        descriptionStyle={{
+          color: "white"
+        }}
         title={location.place_name}
-        description={formatLocationSubtitle(location)}
+        description={formatLocation(location)}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
       />
     </TouchableRipple>
   )
 }
-
-export default withTheme(LocationTile)

@@ -4,9 +4,15 @@ import { requestServer } from '../utilities/requests'
 import LoadingSpinner from "../components/LoadingSpinner"
 import ScrollView from "../components/ScrollView"
 import PostTile from "../components/PostTile"
-import Screen from '../components/Screen'
-import { View } from 'react-native'
-import { Title2 } from 'react-native-ios-kit'
+import Padder from '../components/Padder'
+import SecondaryTitle from '../components/SecondaryTitle'
+import { View, StyleSheet } from 'react-native'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white"
+  }
+})
 
 const fetchLikedPosts = async (customerId) => {
     const payload = {
@@ -36,11 +42,11 @@ export default () => {
     }
 
     return (
-      <Screen>
+      <Padder style={styles.container}>
         <View style={{ flex: 1, gap: 20 }}>
-          <Title2>
+          <SecondaryTitle>
             Tus me gusta
-          </Title2>
+          </SecondaryTitle>
 
           <ScrollView
               data={likedPostsQuery.data}
@@ -50,6 +56,6 @@ export default () => {
               emptyMessage="No te gusta ninguna publicación"
           />
         </View>
-      </Screen>
+      </Padder>
     )
 }

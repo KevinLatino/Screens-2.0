@@ -27,3 +27,9 @@ export const formatDate = (isoDateString) => {
 
   return formatted
 }
+
+export const formatCustomerName = (name, firstSurname, secondSurname) => {
+  const formatted = `${name} ${firstSurname} ${secondSurname}`
+
+  return formatted
+}

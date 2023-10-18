@@ -7,20 +7,25 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
-import { Fragment } from 'react'
+import HomeHeader from '../components/HomeHeader'
+import FloatingActionButton from '../components/FloatingActionButton'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   Portal,
   Modal,
-  Surface,
-  FAB
+  Surface
 } from 'react-native-paper'
 import { View, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingHorizontal: 15
+  },
   fab: {
     position: "absolute",
-    top: Dimensions.get("screen").height * 0.75,
+    top: Dimensions.get("screen").height * 0.8,
     left: Dimensions.get("screen").width * 0.8
   },
   searchBarModal: {
@@ -28,11 +33,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     flex: 1
-  },
-  postsListContainer: {
-    justifyContent: "space-evenly",
-    gap: 16,
-    padding: 16
   }
 })
 
@@ -57,7 +57,7 @@ const PostsList = () => {
     disabled: session.isLoading
   })
 
-  if (postsQuery.isLoading || session.isLoading) {
+  if (postsQuery.isFetching || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -104,8 +104,10 @@ export default () => {
   }
 
   return (
-    <Fragment>
-      <Screen>
+    <View style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <HomeHeader text="Feed" />
+
         <PostsList />
 
         <Portal>
@@ -123,13 +125,13 @@ export default () => {
             </Surface>
           </Modal>
         </Portal>
-      </Screen>
+      </SafeAreaView>
 
-      <FAB
+      <FloatingActionButton
         icon="magnify"
         onPress={() => setIsModalVisible(true)}
         style={styles.fab}
       />
-    </Fragment>
+    </View>
   )
 }

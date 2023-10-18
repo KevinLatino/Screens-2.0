@@ -6,11 +6,27 @@ import { useSession } from '../context'
 import { checkEmail, makeNotEmptyChecker } from '../utilities/validators'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Padder from '../components/Padder'
 import Dialog from 'react-native-dialog'
-import { View } from 'react-native'
-import { RowItem, TableView } from 'react-native-ios-kit'
-import { Text } from 'react-native-paper'
+import SecondaryTitle from '../components/SecondaryTitle'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { View, Alert, StyleSheet } from 'react-native'
+import { List, TouchableRipple, Text, Divider } from 'react-native-paper'
+import configuration from '../configuration'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    gap: 20
+  },
+  settingEntry: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    padding: 10
+  }
+})
 
 const changeEmail = async (customerId, email, password) => {
   const payload = {
@@ -18,9 +34,24 @@ const changeEmail = async (customerId, email, password) => {
     email,
     password
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_PASSWORD") {
+      Alert.alert(
+        "Contraseña incorrecta",
+        "La contraseña que ingresaste es incorrecta"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const _ = await requestServer(
     "/users_service/change_user_email",
-    payload
+    payload,
+    handleError
   )
 }
 
@@ -30,9 +61,24 @@ const changePassword = async (customerId, oldPassword, newPassword) => {
     old_password: oldPassword,
     new_password: newPassword
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_PASSWORD") {
+      Alert.alert(
+        "Contraseña incorrecta",
+        "La contraseña que ingresaste es incorrecta"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const _ = await requestServer(
     "/users_service/change_user_password",
-    payload
+    payload,
+    handleError
   )
 }
 
@@ -58,6 +104,29 @@ const deleteCustomer = async (customerId) => {
   )
 }
 
+const SettingEntry = ({ setting, isDangerous, onPress }) => {
+  return (
+    <TouchableRipple
+      onPress={onPress}
+    >
+      <View style={styles.settingEntry}>
+        <Text
+          variant="bodyMedium"
+          style={isDangerous ? { color: "red" } : { color: configuration.SECONDARY_COLOR }}
+        >
+          {setting}
+        </Text>
+
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={24}
+          color={isDangerous ? "red" : configuration.SECONDARY_COLOR}
+        />
+      </View>
+    </TouchableRipple>
+  )
+}
+
 const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useSession()
 
@@ -69,6 +138,15 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     changeEmailMutation.mutate(form.fields)
   }
 
+  const handleSuccess = () => {
+    onDismiss()
+
+    Alert.alert(
+      "Éxito",
+      "Tu correo electrónico se actualizó con éxito"
+    )
+  }
+
   const customerQuery = useQuery({
     queryKey: ["customerChangeEmail"],
     queryFn: () => fetchCustomer(session.data.customerId),
@@ -76,7 +154,10 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     disabled: session.isLoading
   })
   const changeEmailMutation = useMutation(
-    ({ email, password }) => changeEmail(session.data.customerId, email, password)
+    ({ email, password }) => changeEmail(session.data.customerId, email, password),
+    {
+      onSuccess: handleSuccess
+    }
   )
   const form = useForm(
     {
@@ -88,10 +169,6 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
       password: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-
-  if (changeEmailMutation.isSuccess) {
-    onDismiss()
-  }
 
   if (isVisible && (customerQuery.isLoading || changeEmailMutation.isLoading)) {
     return (
@@ -121,6 +198,7 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -138,8 +216,20 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
     changePasswordMutation.mutate(form.fields)
   }
 
+  const handleSuccess = () => {
+    onDismiss()
+
+    Alert.alert(
+      "Éxito",
+      "Tu contraseña se actualizó con éxito"
+    )
+  }
+
   const changePasswordMutation = useMutation(
-    ({ oldPassword, newPassword }) => changePassword(session.data.customerId, oldPassword, newPassword)
+    ({ oldPassword, newPassword }) => changePassword(session.data.customerId, oldPassword, newPassword),
+    {
+      onSuccess: handleSuccess
+    }
   )
   const form = useForm(
     {
@@ -151,10 +241,6 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
       newPassword: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-
-  if (changePasswordMutation.isSuccess) {
-    onDismiss()
-  }
 
   if (isVisible && changePasswordMutation.isLoading) {
     return (
@@ -185,6 +271,7 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -200,7 +287,9 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
   const [_, setSession] = useSession()
 
   const handleCloseSession = () => {
-    setSession(null)
+    setSession(_ => null)
+
+    onDismiss()
 
     navigation.navigate("Welcome")
   }
@@ -218,6 +307,7 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -264,6 +354,7 @@ const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -287,6 +378,10 @@ export default () => {
     event.preventDefault()
   })
 
+  const navigateToCreateReport = () => {
+    navigation.navigate("CreateReport")
+  }
+
   const customerQuery = useQuery({
     queryKey: ["customerSettings"],
     queryFn: () => fetchCustomer(session.data.customerId),
@@ -300,36 +395,36 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <Text variant="titleLarge">
+    <Padder style={styles.container}>
+      <SecondaryTitle>
         Configuración
-      </Text>
+      </SecondaryTitle>
 
-      <TableView header="Historial">
-        <RowItem
-          title="Publicaciones que te gustan"
+      <List.Section>
+        <SettingEntry
+          setting="Publicaciones que te gustan"
           onPress={() => navigation.navigate("LikedPosts")}
         />
 
-        <RowItem
-          title="Tus compras"
+        <SettingEntry
+          setting="Tus compras"
           onPress={() => navigation.navigate("PurchasesList")}
         />
-      </TableView>
 
-      <TableView header="Cuenta">
+        <Divider />
+
         <View>
           {
             customerQuery.data.account_type === "PlainAccount" ?
             (
               <View>
-                <RowItem
-                  title="Cambiar correo electrónico"
+                <SettingEntry
+                  setting="Cambiar correo electrónico"
                   onPress={() => setIsChangeEmailDialogVisible(true)}
                 />
 
-                <RowItem
-                  title="Cambiar contraseña"
+                <SettingEntry
+                  setting="Cambiar contraseña"
                   onPress={() => setIsChangePasswordDialogVisible(true)}
                 />
               </View>
@@ -338,16 +433,23 @@ export default () => {
           }
         </View>
 
-        <RowItem
-          title="Cerrar sesión"
-          onPress={() => setIsCloseSessionDialogVisible(true)}
+        <SettingEntry
+          setting="Hacer un reporte"
+          onPress={navigateToCreateReport}
         />
 
-        <RowItem
-          title="Eliminar cuenta"
-          onPress={() => setIsDeleteAccountDialogVisible(true)}
+        <SettingEntry
+          setting="Cerrar sesión"
+          onPress={() => setIsCloseSessionDialogVisible(true)}
+          isDangerous
         />
-      </TableView>
+
+        <SettingEntry
+          setting="Eliminar cuenta"
+          onPress={() => setIsDeleteAccountDialogVisible(true)}
+          isDangerous
+        />
+      </List.Section>
 
       <ChangeEmailDialog
         isVisible={isChangeEmailDialogVisible}
@@ -368,6 +470,6 @@ export default () => {
         isVisible={isDeleteAccountDialogVisible}
         onDismiss={() => setIsDeleteAccountDialogVisible(false)}
       />
-    </Screen>
+    </Padder>
   )
 }

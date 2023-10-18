@@ -16,7 +16,7 @@ const likePost = async (postId, customerId) => {
   )
 }
 
-export default ({ postId, doesCustomerLikePost }) => {
+export default ({ postId, doesCustomerLikePost, ...iconButtonProps }) => {
   const queryClient = useQueryClient()
   const [session, _] = useSession()
 
@@ -49,9 +49,9 @@ export default ({ postId, doesCustomerLikePost }) => {
 
   return (
     <IconButton
-      mode="contained"
       icon={isLiked ? "heart" : "heart-outline"}
       onPress={handleLike}
+      {...iconButtonProps}
     />
   )
 }

@@ -1,7 +1,7 @@
 import { Slider as ImportedSlider } from '@miblanchard/react-native-slider'
-import { withTheme } from 'react-native-ios-kit'
+import configuration from '../configuration'
 
-const Slider = ({
+export default ({
   minimumValue,
   maximumValue,
   selectedMinimumValue,
@@ -18,10 +18,8 @@ const Slider = ({
       onValueChange={onChange}
       {...sliderProps}
 
-      thumbStyle={{ backgroundColor: "white" }}
-      trackStyle={{ backgroundColor: theme.primaryColor }}
+      thumbStyle={{ backgroundColor: configuration.SECONDARY_COLOR }}
+      trackStyle={{ backgroundColor: configuration.ACCENT_COLOR_1 }}
     />
   )
 }
-
-export default withTheme(Slider)

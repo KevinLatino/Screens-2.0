@@ -2,11 +2,20 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { View } from 'react-native'
-import { List, Text } from 'react-native-paper'
+import { View, StyleSheet } from 'react-native'
+import { List } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
+import SecondaryTitle from '../components/SecondaryTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Padder from '../components/Padder'
+import Scroller from '../components/Scroller'
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white"
+  }
+})
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
@@ -75,32 +84,38 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <Text variant="titleLarge">
-        Entregas que esperas
-      </Text>
+    <Scroller>
+      <Padder style={styles.container}>
+        <SecondaryTitle>
+          Entregas que esperas
+        </SecondaryTitle>
 
-      <List.Section>
-        <List.Subheader>
-          Entregas activas
-        </List.Subheader>
+        <List.Section>
+          <List.Subheader>
+            Entregas activas
+          </List.Subheader>
 
-        {
-          activeDeliveriesQuery.isLoading ?
-          <LoadingSpinner /> :
-          <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
-        }
+          {
+            activeDeliveriesQuery.isLoading ?
+            <LoadingSpinner /> :
+            <DeliveriesListItems
+              deliveries={activeDeliveriesQuery.data}
+            />
+          }
 
-        <List.Subheader>
-          Entregas inactivas
-        </List.Subheader>
+          <List.Subheader>
+            Entregas inactivas
+          </List.Subheader>
 
-        {
-          inactiveDeliveriesQuery.isLoading ?
-          <LoadingSpinner /> :
-          <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
-        }
-      </List.Section>
-    </Screen>
+          {
+            inactiveDeliveriesQuery.isLoading ?
+            <LoadingSpinner /> :
+            <DeliveriesListItems
+              deliveries={inactiveDeliveriesQuery.data}
+            />
+          }
+        </List.Section>
+      </Padder>
+    </Scroller>
   )
 }
